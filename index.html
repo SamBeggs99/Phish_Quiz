@@ -264,24 +264,7 @@
             height: auto; /* Maintain aspect ratio */
             box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); /* Add a glow for visibility */
         }
-        /* Cheat button style */
-        #cheatButton {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background-color: #5a5a5a; /* Dark grey */
-            color: #e0e0e0;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            z-index: 100; /* Ensure it's above other elements */
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-        #cheatButton:hover {
-            opacity: 1;
-        }
+        /* Cheat button style - REMOVED */
 
         /* Admin Log Button */
         #adminLogButton {
@@ -472,8 +455,6 @@
         </div>
     </div>
 
-    <!-- Cheat Button (for testing only) -->
-    <button id="cheatButton">Cheat to 100%</button>
     <!-- Admin Log Button (New) -->
     <button id="adminLogButton">Admin Log</button>
 
@@ -502,12 +483,27 @@
         let auth;
         let userId;
         let isAuthReady = false;
-        let quizResultsData = []; // Store fetched quiz results globally
+        // Make quizResultsData a property of window to be globally accessible
+        window.quizResultsData = []; // Store fetched quiz results globally
 
-        // Firebase configuration (provided by Canvas environment)
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // Firebase configuration (YOUR ACTUAL FIREBASE CONFIG)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCZZ3rAIOBc-a_TBLTIMYN7VSPiiFezuwc",
+            authDomain: "pac-phish-quiz.firebaseapp.com",
+            projectId: "pac-phish-quiz",
+            storageBucket: "pac-phish-quiz.firebasestorage.app",
+            messagingSenderId: "958300233521",
+            appId: "1:958300233521:web:b354877854e35604829a10"
+        };
+
+        // Define a consistent app ID for Firestore collection path.
+        // Using the projectId from your config for consistency.
+        const appId = firebaseConfig.projectId;
+
+        // The initialAuthToken is specific to the Canvas environment and won't work on GitHub Pages.
+        // We will sign in anonymously directly if no user is authenticated.
+        const initialAuthToken = null; // Set to null for GitHub Pages deployment
+
 
         // Initialize Firebase and set up authentication listener
         async function initializeFirebase() {
@@ -516,6 +512,7 @@
                     app = initializeApp(firebaseConfig);
                     db = getFirestore(app);
                     auth = getAuth(app);
+                    console.log("Firebase app initialized."); // Log successful initialization
 
                     onAuthStateChanged(auth, async (user) => {
                         if (user) {
@@ -526,24 +523,25 @@
                             listenToQuizResults();
                         } else {
                             // Sign in anonymously if no user is authenticated
-                            if (initialAuthToken) {
-                                await signInWithCustomToken(auth, initialAuthToken);
-                                console.log("Signed in with custom token.");
-                            } else {
+                            // The initialAuthToken is not used here for GitHub Pages deployment
+                            try {
                                 await signInAnonymously(auth);
                                 console.log("Signed in anonymously.");
+                            } catch (anonError) {
+                                console.error("Error signing in anonymously:", anonError);
+                                showMessageBox("Failed to sign in to the application. Please check your internet connection and ensure Anonymous Authentication is enabled in Firebase.");
                             }
                         }
                     });
                 }
             } catch (error) {
                 console.error("Error initializing Firebase:", error);
-                showMessageBox("Error initializing application services. Please try again.");
+                showMessageBox("Error initializing application services. Please ensure your Firebase configuration is correct and your internet connection is stable.");
             }
         }
 
-        // Function to save quiz results to Firestore
-        async function saveQuizResult(name, score, totalQuestions, perfectScore) {
+        // Function to save quiz results to Firestore (made global)
+        window.saveQuizResult = async function(name, score, totalQuestions, perfectScore) {
             if (!isAuthReady) {
                 console.warn("Firebase Auth not ready. Cannot save quiz result.");
                 showMessageBox("Application not fully loaded. Please try submitting again in a moment.");
@@ -585,7 +583,7 @@
                 snapshot.forEach((doc) => {
                     results.push({ id: doc.id, ...doc.data() });
                 });
-                quizResultsData = results; // Store results globally for CSV export
+                window.quizResultsData = results; // Store results globally for CSV export
                 displayQuizLog(results);
                 console.log("Quiz log updated.");
             }, (error) => {
@@ -758,6 +756,10 @@
         let userAnswers = new Array(questions.length).fill(null); // Stores selected option index
         let score = 0;
         let userName = '';
+        let wasBackgroundMusicPlaying = false; // New variable to track background music state
+        const initialBackgroundVolume = 0.5; // Set initial background music volume
+        const fanfareDuration = 8000; // Total fanfare duration in milliseconds (increased)
+        // Removed fanfareFadeOutDuration as it's no longer needed for a hard cut
 
         // DOM Elements
         const welcomeSection = document.getElementById('welcomeSection');
@@ -778,7 +780,7 @@
         const nameModal = document.getElementById('nameModal');
         const userNameModalInput = document.getElementById('userNameModalInput');
         const submitNameButton = document.getElementById('submitNameButton');
-        const cheatButton = document.getElementById('cheatButton'); // Get the cheat button
+        // Removed cheatButton
         const adminLogButton = document.getElementById('adminLogButton'); // New Admin Log button
         const quizLogSection = document.getElementById('quizLogSection'); // Quiz Log section
         const backToWelcomeButton = document.getElementById('backToWelcomeButton'); // Back button in log
@@ -791,6 +793,9 @@
         const backgroundMusic = document.getElementById('backgroundMusic'); // Audio element for background music
         const muteButton = document.getElementById('muteButton'); // Mute button
         const starAnimationOverlay = document.getElementById('starAnimationOverlay'); // Star animation container
+
+        // Set initial background music volume
+        backgroundMusic.volume = initialBackgroundVolume;
 
 
         totalQuestionsSpan.textContent = questions.length; // Update total questions count
@@ -840,8 +845,10 @@
             quizLogSection.style.display = 'none'; // Hide log if visible
             quizSection.style.display = 'block';
             loadQuestion();
-            // Attempt to play background music when quiz starts
-            backgroundMusic.play().catch(e => console.log("Background music autoplay prevented:", e));
+            // Attempt to play background music when quiz starts.
+            // This might still be prevented by browser autoplay policies on first user interaction,
+            // but subsequent plays (e.g., after muting/unmuting) should work.
+            backgroundMusic.play().catch(e => console.log("Background music autoplay prevented (initial):", e));
         });
 
         // Event listener for Admin Log button (new)
@@ -971,14 +978,36 @@
             if (score === questions.length) {
                 // User scored 100%, show name input modal
                 nameModal.classList.remove('hidden');
+                
+                // Pause background music before playing fanfare
+                wasBackgroundMusicPlaying = !backgroundMusic.paused && !backgroundMusic.muted; // Check if it was playing and not muted
+                if (wasBackgroundMusicPlaying) {
+                    backgroundMusic.pause();
+                }
+
                 // Play fanfare
                 if (fanfareSound) {
+                    fanfareSound.volume = 1.0; // Ensure fanfare starts at full volume
                     fanfareSound.play().catch(e => console.error("Error playing fanfare:", e));
-                    // Stop fanfare after 7 seconds
+
+                    // Stop fanfare after its duration and resume background music with fade-in
                     setTimeout(() => {
                         fanfareSound.pause();
                         fanfareSound.currentTime = 0; // Reset sound to beginning
-                    }, 7000); // 7 seconds
+                        if (wasBackgroundMusicPlaying) { // Only resume if it was playing before fanfare
+                            backgroundMusic.volume = 0; // Start volume at 0
+                            backgroundMusic.play().catch(e => console.log("Background music autoplay prevented on resume:", e));
+                            
+                            // Fade in the background music
+                            let fadeInInterval = setInterval(() => {
+                                if (backgroundMusic.volume < initialBackgroundVolume) {
+                                    backgroundMusic.volume = Math.min(backgroundMusic.volume + 0.01, initialBackgroundVolume); // Increase volume slowly
+                                } else {
+                                    clearInterval(fadeInInterval); // Stop fading when target volume is reached
+                                }
+                            }, 100); // Adjust interval for smoother/faster fade
+                        }
+                    }, fanfareDuration); // Wait for the full fanfare duration
                 }
                 // Trigger stars
                 triggerStarAnimation();
@@ -986,7 +1015,7 @@
                 // User did not score 100%, show a message
                 showMessageBox(`You scored ${score} out of ${questions.length}. You need 100% to get the certificate. Please try again!`);
                 // Save result even if not perfect
-                saveQuizResult('Anonymous', score, questions.length, false);
+                window.saveQuizResult('Anonymous', score, questions.length, false); // Use window.saveQuizResult
                 resetQuiz();
             }
         }
@@ -1013,7 +1042,7 @@
                 console.log("Certificate container should now be visible. Display style:", window.getComputedStyle(certificateContainer).display);
 
                 // Save perfect score result
-                saveQuizResult(userName, score, questions.length, true);
+                window.saveQuizResult(userName, score, questions.length, true); // Use window.saveQuizResult
 
             } else {
                 showMessageBox('Please enter your name to generate the certificate.');
@@ -1038,6 +1067,7 @@
             if (fanfareSound) {
                 fanfareSound.pause();
                 fanfareSound.currentTime = 0;
+                fanfareSound.volume = 1.0; // Reset fanfare volume for next play
             }
             starAnimationOverlay.innerHTML = ''; // Clear all stars
             // Remove any debug canvas that might be present
@@ -1076,13 +1106,7 @@
             document.body.appendChild(messageBox);
         }
 
-        // Event listener for the Cheat Button
-        cheatButton.addEventListener('click', () => {
-            score = questions.length; // Set score to 100%
-            // Simulate submitting the quiz to trigger the results display
-            displayResults();
-            showMessageBox("Cheat activated! You scored 100%.");
-        });
+        // Removed Event listener for the Cheat Button
 
         // Event listener for Mute Button
         muteButton.addEventListener('click', () => {
@@ -1098,7 +1122,8 @@
 
         // Function to export quiz log data to CSV
         function exportQuizLogToCSV() {
-            if (quizResultsData.length === 0) {
+            // Access the global quizResultsData
+            if (window.quizResultsData.length === 0) {
                 showMessageBox("No quiz data to export yet!");
                 return;
             }
@@ -1107,7 +1132,7 @@
             const headers = ["User Name", "Score", "Total Questions", "Perfect Score", "Date", "User ID"];
             
             // Map data to CSV rows
-            const rows = quizResultsData.map(result => {
+            const rows = window.quizResultsData.map(result => {
                 const userName = `"${(result.userName || 'Anonymous').replace(/"/g, '""')}"`; // Handle commas and quotes
                 const score = result.score;
                 const totalQuestions = result.totalQuestions;
