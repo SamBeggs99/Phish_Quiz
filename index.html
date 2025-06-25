@@ -302,6 +302,26 @@
             opacity: 1;
         }
 
+        /* Mute Button Style */
+        #muteButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #4a4a4a;
+            color: #e0e0e0;
+            padding: 8px 12px;
+            border-radius: 0.75rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            z-index: 100;
+            opacity: 0.8;
+            transition: opacity 0.2s, background-color 0.2s;
+        }
+        #muteButton:hover {
+            opacity: 1;
+            background-color: #5a5a5a;
+        }
+
 
         /* Quiz Log specific styles */
         #quizLogSection {
@@ -424,7 +444,10 @@
             <ul id="quizLogList">
                 <!-- Log entries will be loaded here -->
             </ul>
-            <button id="backToWelcomeButton" class="nav-button secondary w-full mt-6">Back to Welcome</button>
+            <div class="flex justify-between mt-6">
+                <button id="exportCsvButton" class="nav-button primary">Export to CSV</button>
+                <button id="backToWelcomeButton" class="nav-button secondary">Back to Welcome</button>
+            </div>
         </div>
     </div>
 
@@ -454,9 +477,14 @@
     <!-- Admin Log Button (New) -->
     <button id="adminLogButton">Admin Log</button>
 
-    <!-- Audio for fanfare. REPLACE THIS URL with your desired fanfare sound URL.
-         Ensure the sound is royalty-free or you have the necessary license for your use case. -->
-    <audio id="fanfareSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
+    <!-- Mute Button -->
+    <button id="muteButton">Mute Music</button>
+
+    <!-- Audio for fanfare. -->
+    <audio id="fanfareSound" src="https://raw.githubusercontent.com/SamBeggs99/Phish_Quiz/main/main-library-super-fanfare-276484.mp3" preload="auto"></audio>
+
+    <!-- Audio for background music. -->
+    <audio id="backgroundMusic" src="https://raw.githubusercontent.com/SamBeggs99/Phish_Quiz/main/lofi-background-music-lo-fi-309034.mp3" loop autoplay></audio>
 
     <!-- Stars Animation Container -->
     <div id="starAnimationOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 999;"></div>
@@ -474,6 +502,7 @@
         let auth;
         let userId;
         let isAuthReady = false;
+        let quizResultsData = []; // Store fetched quiz results globally
 
         // Firebase configuration (provided by Canvas environment)
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
@@ -556,6 +585,7 @@
                 snapshot.forEach((doc) => {
                     results.push({ id: doc.id, ...doc.data() });
                 });
+                quizResultsData = results; // Store results globally for CSV export
                 displayQuizLog(results);
                 console.log("Quiz log updated.");
             }, (error) => {
@@ -752,11 +782,14 @@
         const adminLogButton = document.getElementById('adminLogButton'); // New Admin Log button
         const quizLogSection = document.getElementById('quizLogSection'); // Quiz Log section
         const backToWelcomeButton = document.getElementById('backToWelcomeButton'); // Back button in log
+        const exportCsvButton = document.getElementById('exportCsvButton'); // New Export CSV button
         const passwordModal = document.getElementById('passwordModal'); // Password modal
         const passwordInput = document.getElementById('passwordInput'); // Password input field
         const submitPasswordButton = document.getElementById('submitPasswordButton'); // Submit password button
         const cancelPasswordButton = document.getElementById('cancelPasswordButton'); // Cancel password button
         const fanfareSound = document.getElementById('fanfareSound'); // Audio element for fanfare
+        const backgroundMusic = document.getElementById('backgroundMusic'); // Audio element for background music
+        const muteButton = document.getElementById('muteButton'); // Mute button
         const starAnimationOverlay = document.getElementById('starAnimationOverlay'); // Star animation container
 
 
@@ -807,6 +840,8 @@
             quizLogSection.style.display = 'none'; // Hide log if visible
             quizSection.style.display = 'block';
             loadQuestion();
+            // Attempt to play background music when quiz starts
+            backgroundMusic.play().catch(e => console.log("Background music autoplay prevented:", e));
         });
 
         // Event listener for Admin Log button (new)
@@ -843,6 +878,10 @@
         backToWelcomeButton.addEventListener('click', () => {
             quizLogSection.style.display = 'none';
             welcomeSection.style.display = 'block';
+            // Resume background music if it was playing before entering log
+            if (!backgroundMusic.muted) {
+                backgroundMusic.play().catch(e => console.log("Background music autoplay prevented on return:", e));
+            }
         });
 
         // Event listener for Next button
@@ -1006,6 +1045,10 @@
             if (debugCanvas && debugCanvas.parentNode) {
                 debugCanvas.parentNode.removeChild(debugCanvas);
             }
+            // Ensure background music is playing if not muted
+            if (!backgroundMusic.muted) {
+                backgroundMusic.play().catch(e => console.log("Background music autoplay prevented on reset:", e));
+            }
         }
 
         // Function to show a custom message box (replaces alert())
@@ -1040,6 +1083,56 @@
             displayResults();
             showMessageBox("Cheat activated! You scored 100%.");
         });
+
+        // Event listener for Mute Button
+        muteButton.addEventListener('click', () => {
+            if (backgroundMusic.muted) {
+                backgroundMusic.muted = false;
+                muteButton.textContent = "Mute Music";
+                backgroundMusic.play().catch(e => console.log("Background music autoplay prevented on unmute:", e));
+            } else {
+                backgroundMusic.muted = true;
+                muteButton.textContent = "Unmute Music";
+            }
+        });
+
+        // Function to export quiz log data to CSV
+        function exportQuizLogToCSV() {
+            if (quizResultsData.length === 0) {
+                showMessageBox("No quiz data to export yet!");
+                return;
+            }
+
+            // Define CSV headers
+            const headers = ["User Name", "Score", "Total Questions", "Perfect Score", "Date", "User ID"];
+            
+            // Map data to CSV rows
+            const rows = quizResultsData.map(result => {
+                const userName = `"${(result.userName || 'Anonymous').replace(/"/g, '""')}"`; // Handle commas and quotes
+                const score = result.score;
+                const totalQuestions = result.totalQuestions;
+                const perfectScore = result.perfectScore ? "Yes" : "No";
+                const date = result.timestamp ? new Date(result.timestamp.toDate()).toLocaleDateString() : 'N/A';
+                const userId = result.userId;
+                return `${userName},${score},${totalQuestions},${perfectScore},"${date}","${userId}"`;
+            });
+
+            // Combine headers and rows
+            const csvContent = [headers.join(","), ...rows].join("\n");
+
+            // Create a Blob and download link
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute('download', 'quiz_log.csv');
+            document.body.appendChild(link); // Append to body to make it clickable
+            link.click(); // Programmatically click the link to trigger download
+            document.body.removeChild(link); // Clean up the link
+            showMessageBox("Quiz log exported to CSV!");
+        }
+
+        // Event listener for Export CSV button
+        exportCsvButton.addEventListener('click', exportQuizLogToCSV);
 
 
         // Event listener for Download PDF button
@@ -1135,6 +1228,13 @@
         nameModal.classList.add('hidden');
         quizLogSection.style.display = 'none'; // Ensure log is hidden initially
         passwordModal.classList.add('hidden'); // Ensure password modal is hidden initially
+
+        // Initial attempt to play background music on page load
+        // This might be prevented by browser autoplay policies,
+        // but it will play once the user interacts with the page (e.g., clicks "Start Quiz").
+        window.addEventListener('load', () => {
+            backgroundMusic.play().catch(e => console.log("Background music autoplay prevented on load:", e));
+        });
     </script>
 </body>
 </html>
