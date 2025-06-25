@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAC Cybersecurity Awareness Quiz & Certificate</title>
+    <!-- Tailwind CSS CDN for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a1a; /* Dark background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: #e0e0e0; /* Light grey text for general content */
+        }
+        .quiz-container {
+            background-color: #2c2c2c; /* Slightly lighter dark grey */
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .question-card {
+            background-color: #3a3a3a; /* Even lighter dark grey */
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid #4f4f4f;
+        }
+        .option-button {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
+            background-color: #4a4a4a; /* Dark grey option button */
+            color: #e0e0e0; /* Light grey text */
+            border: 1px solid #666666;
+            border-radius: 0.75rem;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
+        }
+        .option-button:hover {
+            background-color: #5a5a5a; /* Slightly lighter on hover */
+            border-color: #888888;
+            transform: translateY(-2px);
+        }
+        .option-button.selected {
+            background-color: #884444; /* Dark red when selected */
+            border-color: #cc3333;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .option-button.correct {
+            background-color: #10b981; /* Green for correct - good contrast */
+            border-color: #059669;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .option-button.incorrect {
+            background-color: #ef4444; /* Red for incorrect - good contrast */
+            border-color: #b91c1c;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .nav-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .nav-button.primary {
+            background-color: #cc3333; /* Red primary button */
+            color: #ffffff;
+            box-shadow: 0 4px 6px rgba(204, 51, 51, 0.2);
+        }
+        .nav-button.primary:hover {
+            background-color: #b32d2d;
+            transform: translateY(-2px);
+        }
+        .nav-button.secondary {
+            background-color: #4a4a4a; /* Dark grey secondary */
+            color: #e0e0e0;
+        }
+        .nav-button.secondary:hover {
+            background-color: #5a5a5a;
+            transform: translateY(-2px);
+        }
+
+        /* Certificate Styling - Initially hidden */
+        #certificateContainer {
+            display: none; /* Controlled by JS */
+            background-color: #ffffff; /* Remains white for print contrast */
+            border: 8px solid #fcd34d; /* Gold border */
+            padding: 60px; /* Increased padding */
+            margin-top: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25); /* More pronounced shadow */
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            color: #333; /* Dark text for readability on white/gold */
+            min-height: 450px; /* Ensure it has some height */
+        }
+
+        #certificateContainer::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            background: linear-gradient(45deg, #fde68a, #fcd34d, #fbbf24); /* Gold gradient */
+            z-index: -1;
+            filter: blur(15px);
+            opacity: 0.7;
+        }
+
+        #certificateContainer h1 {
+            font-family: 'Inter', sans-serif;
+            font-size: 3.2em; /* Slightly reduced font size for better fit */
+            color: #b45309; /* Darker gold/brown */
+            margin-bottom: 20px; /* More space below title */
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.15); /* Softer, larger shadow */
+            font-weight: 800; /* Extra bold */
+            
+            /* Centering with flexbox, removed white-space: nowrap */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center; /* Ensures individual lines are centered */
+            flex-wrap: wrap; /* Allow content to wrap */
+        }
+        /* Ensure emojis don't break centering */
+        #certificateContainer h1 .emoji {
+            display: inline-block; /* Treat emojis as inline blocks for consistent spacing */
+            margin: 0 5px; /* Add some margin around emojis */
+        }
+
+
+        #certificateContainer .awarded-text {
+            font-size: 1.4em; /* Slightly larger */
+            color: #444; /* Softer black */
+            margin-bottom: 15px;
+        }
+
+        #certificateContainer .student-name {
+            font-family: 'Inter', sans-serif;
+            font-size: 3.2em; /* Even larger name */
+            color: #0078D4; /* Blue for name */
+            margin: 25px 0; /* More vertical space */
+            font-weight: 800; /* Extra bold */
+            text-transform: capitalize;
+            text-shadow: 1px 1px 3px rgba(0,120,212,0.3); /* More visible shadow for name */
+        }
+
+        #certificateContainer .achievement-text {
+            font-size: 1.6em; /* Larger achievement text */
+            color: #555;
+            margin-top: 25px; /* More space above */
+            line-height: 1.6; /* Improved line spacing */
+            font-weight: 600; /* Semi-bold */
+        }
+        #certificateContainer .achievement-text strong {
+            color: #b45309; /* Highlight bold parts with gold-like color */
+        }
+        #certificateContainer .achievement-text .emoji {
+            font-size: 1.2em; /* Slightly larger emojis */
+        }
+
+
+        #certificateContainer .date-awarded {
+            font-size: 1.3em;
+            color: #666;
+            margin-top: 25px; /* More space */
+            font-weight: 600;
+        }
+
+        #certificateContainer .issuer-info {
+            font-size: 1.2em;
+            color: #555;
+            margin-top: 35px; /* More space */
+            font-weight: 600;
+        }
+
+        #certificateContainer .motto {
+            font-size: 1.3em;
+            color: #0078D4;
+            font-weight: 700;
+            margin-top: 15px;
+            text-shadow: 0.5px 0.5px 1px rgba(0,120,212,0.1);
+        }
+
+        .download-button {
+            background-color: #10b981; /* Green */
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            margin-top: 2rem;
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+        }
+        .download-button:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Darker overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: #2c2c2c; /* Dark modal background */
+            color: #e0e0e0; /* Light text */
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .modal-content input {
+            background-color: #3a3a3a;
+            border-color: #4f4f4f;
+            color: #e0e0e0;
+        }
+        .modal-content input::placeholder {
+            color: #a0a0a0;
+        }
+
+        /* Debugging Canvas Style */
+        .debug-canvas {
+            position: fixed;
+            top: 50%; /* Center the debug canvas */
+            left: 50%;
+            transform: translate(-50%, -50%); /* Adjust for centering */
+            z-index: 9999;
+            border: 2px solid red;
+            background-color: white; /* Ensure it's not transparent */
+            display: block; /* Ensure it's visible */
+            max-width: 90%; /* Prevent it from being too large */
+            height: auto; /* Maintain aspect ratio */
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); /* Add a glow for visibility */
+        }
+        /* Cheat button style */
+        #cheatButton {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: #5a5a5a; /* Dark grey */
+            color: #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            z-index: 100; /* Ensure it's above other elements */
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        #cheatButton:hover {
+            opacity: 1;
+        }
+
+        /* Admin Log Button */
+        #adminLogButton {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background-color: #4a4a4a; /* Dark grey */
+            color: #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            z-index: 100;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        #adminLogButton:hover {
+            opacity: 1;
+        }
+
+
+        /* Quiz Log specific styles */
+        #quizLogSection {
+            display: none; /* Hidden by default */
+            background-color: #2c2c2c;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 600px;
+            margin-top: 2rem;
+        }
+        #quizLogList {
+            list-style: none;
+            padding: 0;
+        }
+        #quizLogList li {
+            background-color: #3a3a3a;
+            border: 1px solid #4f4f4f;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+        #quizLogList li.perfect-score {
+            background-color: #10b981; /* Green highlight for perfect scores */
+            color: #ffffff;
+            font-weight: 600;
+            border-color: #059669;
+        }
+        #quizLogList li span {
+            color: #e0e0e0;
+        }
+        #quizLogList li.perfect-score span {
+             color: #ffffff;
+        }
+
+        /* Star animation */
+        @keyframes star-fall {
+            0% {
+                transform: translate(var(--start-x), var(--start-y)) scale(0.2);
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+                transform: translate(var(--mid-x), var(--mid-y)) scale(0.8);
+            }
+            100% {
+                transform: translate(var(--end-x), var(--end-y)) scale(0.5);
+                opacity: 0;
+            }
+        }
+
+        .star {
+            position: absolute;
+            background-color: #FFD700; /* Gold color */
+            border-radius: 50%;
+            animation: star-fall var(--duration) ease-out forwards;
+            box-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700; /* Glow effect */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-5">
+
+    <div class="quiz-container">
+        <!-- Welcome Section -->
+        <div id="welcomeSection">
+            <h1 class="text-3xl font-bold text-white mb-6">Welcome to the PAC Phishing Quiz!</h1>
+            <p class="text-lg text-center text-gray-300 mb-8">
+                Show us your phishing detection skillz! If you score 100%, you'll even get a certificate!
+            </p>
+            <button id="startQuizButton" class="nav-button primary w-full mb-4">Start Quiz</button>
+            <!-- Removed View Quiz Log button from here -->
+        </div>
+
+        <!-- Quiz Questions Section (Initially Hidden) -->
+        <div id="quizSection" style="display: none;">
+            <div id="questionDisplay" class="question-card">
+                <p class="text-xl font-semibold text-gray-100 mb-4" id="questionText"></p>
+                <div id="optionsContainer" class="flex flex-col gap-3">
+                    <!-- Options will be loaded here by JavaScript -->
+                </div>
+            </div>
+
+            <div class="flex justify-between mt-6">
+                <button id="prevButton" class="nav-button secondary" disabled>Previous</button>
+                <button id="nextButton" class="nav-button primary">Next</button>
+                <button id="submitButton" class="nav-button primary hidden">Submit Quiz</button>
+            </div>
+
+            <div id="scoreDisplay" class="text-center text-2xl font-bold text-gray-100 mt-6 hidden">
+                Your Score: <span id="currentScore">0</span> / <span id="totalQuestions">0</span>
+            </div>
+        </div>
+
+        <!-- Certificate Container (Initially Hidden) -->
+        <div id="certificateContainer" class="w-full">
+            <h1 class="text-5xl font-bold text-yellow-800 mb-4"><span class="emoji">🎉</span> PAC Cybersecurity Achievement Certificate <span class="emoji">🎉</span></h1>
+            <p class="awarded-text">This is proudly awarded to:</p>
+            <h2 class="student-name text-blue-700 text-4xl font-bold my-4" id="certificateName"></h2>
+            <p class="achievement-text">
+                🏆 For achieving a <strong>PERFECT SCORE</strong> on the<br>
+                <strong>PAC Phishing Awareness Quiz</strong><br>
+                You spotted every trap. You dodged every link.<br>
+                You are officially a certified <span class="emoji">🛡️</span> <strong>PHISHING EXPERT!</strong>
+            </p>
+            <p class="date-awarded">🗓️ Date: <span id="certificateDate"></span></p>
+            <p class="issuer-info">🎓 Issued by: The PAC Group Cybersecurity Team</p>
+            <p class="motto">“Pause. Verify. Report.”</p>
+
+            <button id="downloadPdfButton" class="download-button">Download Certificate as PDF</button>
+        </div>
+
+        <!-- Quiz Log Section (Initially Hidden) -->
+        <div id="quizLogSection">
+            <h2 class="text-3xl font-bold text-white mb-6 text-center">Quiz Log</h2>
+            <ul id="quizLogList">
+                <!-- Log entries will be loaded here -->
+            </ul>
+            <button id="backToWelcomeButton" class="nav-button secondary w-full mt-6">Back to Welcome</button>
+        </div>
+    </div>
+
+    <!-- Name Input Modal (Initially Hidden) -->
+    <div id="nameModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 class="text-2xl font-bold text-white mb-4">Congratulations!</h2>
+            <p class="text-lg text-gray-300 mb-4">You scored 100%! Please enter your full name for your certificate:</p>
+            <input type="text" id="userNameModalInput" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4" placeholder="Your Full Name">
+            <button id="submitNameButton" class="nav-button primary w-full">Get My Certificate</button>
+        </div>
+    </div>
+
+    <!-- Password Input Modal (New) -->
+    <div id="passwordModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 class="text-2xl font-bold text-white mb-4">Enter Password</h2>
+            <p class="text-lg text-gray-300 mb-4">Please enter the admin password to view the quiz log:</p>
+            <input type="password" id="passwordInput" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4" placeholder="Password">
+            <button id="submitPasswordButton" class="nav-button primary w-full">Submit</button>
+            <button id="cancelPasswordButton" class="nav-button secondary w-full mt-2">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Cheat Button (for testing only) -->
+    <button id="cheatButton">Cheat to 100%</button>
+    <!-- Admin Log Button (New) -->
+    <button id="adminLogButton">Admin Log</button>
+
+    <!-- Audio for fanfare. REPLACE THIS URL with your desired fanfare sound URL.
+         Ensure the sound is royalty-free or you have the necessary license for your use case. -->
+    <audio id="fanfareSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
+
+    <!-- Stars Animation Container -->
+    <div id="starAnimationOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 999;"></div>
+
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Firebase variables
+        let app;
+        let db;
+        let auth;
+        let userId;
+        let isAuthReady = false;
+
+        // Firebase configuration (provided by Canvas environment)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Initialize Firebase and set up authentication listener
+        async function initializeFirebase() {
+            try {
+                if (!app) { // Initialize only once
+                    app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    auth = getAuth(app);
+
+                    onAuthStateChanged(auth, async (user) => {
+                        if (user) {
+                            userId = user.uid;
+                            isAuthReady = true;
+                            console.log("Firebase Auth Ready. User ID:", userId);
+                            // Start listening to quiz results once authenticated
+                            listenToQuizResults();
+                        } else {
+                            // Sign in anonymously if no user is authenticated
+                            if (initialAuthToken) {
+                                await signInWithCustomToken(auth, initialAuthToken);
+                                console.log("Signed in with custom token.");
+                            } else {
+                                await signInAnonymously(auth);
+                                console.log("Signed in anonymously.");
+                            }
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+                showMessageBox("Error initializing application services. Please try again.");
+            }
+        }
+
+        // Function to save quiz results to Firestore
+        async function saveQuizResult(name, score, totalQuestions, perfectScore) {
+            if (!isAuthReady) {
+                console.warn("Firebase Auth not ready. Cannot save quiz result.");
+                showMessageBox("Application not fully loaded. Please try submitting again in a moment.");
+                return;
+            }
+
+            try {
+                // Store in a public collection under the app ID
+                const quizResultsCollectionRef = collection(db, `artifacts/${appId}/public/data/quiz_results`);
+                await addDoc(quizResultsCollectionRef, {
+                    userName: name,
+                    score: score,
+                    totalQuestions: totalQuestions,
+                    perfectScore: perfectScore,
+                    timestamp: serverTimestamp(), // Use server timestamp
+                    userId: userId // Store userId for reference
+                });
+                console.log("Quiz result saved successfully!");
+            } catch (error) {
+                console.error("Error saving quiz result:", error);
+                showMessageBox("Failed to save quiz result. Please check your internet connection.");
+            }
+        }
+
+        // Function to listen to and display quiz results
+        function listenToQuizResults() {
+            if (!isAuthReady || !db) {
+                console.warn("Firestore not ready. Cannot listen to quiz results.");
+                return;
+            }
+
+            const quizResultsCollectionRef = collection(db, `artifacts/${appId}/public/data/quiz_results`);
+            // Note: orderBy is commented out to avoid potential index issues,
+            // sorting will be done in memory if needed.
+            const q = query(quizResultsCollectionRef); // Removed orderBy for now
+
+            onSnapshot(q, (snapshot) => {
+                const results = [];
+                snapshot.forEach((doc) => {
+                    results.push({ id: doc.id, ...doc.data() });
+                });
+                displayQuizLog(results);
+                console.log("Quiz log updated.");
+            }, (error) => {
+                console.error("Error listening to quiz results:", error);
+                showMessageBox("Failed to load quiz log. Please check your internet connection.");
+            });
+        }
+
+        // Function to display the quiz log in the UI
+        function displayQuizLog(results) {
+            const quizLogList = document.getElementById('quizLogList');
+            quizLogList.innerHTML = ''; // Clear previous entries
+
+            // Sort results by timestamp if available (most recent first)
+            results.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
+
+            if (results.length === 0) {
+                quizLogList.innerHTML = '<li class="text-center text-gray-400">No quiz results yet. Be the first!</li>';
+                return;
+            }
+
+            results.forEach(result => {
+                const listItem = document.createElement('li');
+                let scoreText = `${result.score}/${result.totalQuestions}`;
+                if (result.perfectScore) {
+                    listItem.classList.add('perfect-score');
+                    scoreText += ' (Perfect!)';
+                }
+                const date = result.timestamp ? new Date(result.timestamp.toDate()).toLocaleDateString() : 'N/A';
+                listItem.innerHTML = `
+                    <span>${result.userName || 'Anonymous'}</span>
+                    <span>${scoreText}</span>
+                    <span class="text-sm text-gray-400">${date}</span>
+                `;
+                quizLogList.appendChild(listItem);
+            });
+        }
+
+        // Call Firebase initialization on load
+        initializeFirebase();
+    </script>
+
+    <!-- Libraries for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        const questions = [
+            {
+                question: "What is phishing?",
+                options: [
+                    "A tool used by IT to verify employee credentials",
+                    "A routine message that validates your account information",
+                    "A deceptive message meant to trick you into giving up sensitive data"
+                ],
+                correctAnswer: "A deceptive message meant to trick you into giving up sensitive data"
+            },
+            {
+                question: "Which of the following would most likely indicate a phishing email?",
+                options: [
+                    "The sender uses your full name and signature",
+                    "The message includes a logo and appears professionally formatted",
+                    "The message urges immediate action and has unexpected links or attachments"
+                ],
+                correctAnswer: "The message urges immediate action and has unexpected links or attachments"
+            },
+            {
+                question: "What is the safest first step if you’re unsure about the legitimacy of an email?",
+                options: [
+                    "Use your organization's report button or alert IT/security",
+                    "Forward it to a colleague to get their opinion",
+                    "Click the link to check where it leads before deciding"
+                ],
+                correctAnswer: "Use your organization's report button or alert IT/security"
+            },
+            {
+                question: "Before clicking a link in an email, what’s the most reliable way to assess its safety?",
+                options: [
+                    "Hover over the link and verify the destination URL matches the sender’s intent",
+                    "Check that the link is underlined and spelled correctly",
+                    "Confirm that the link is hosted on a well-known domain like “google.com”"
+                ],
+                correctAnswer: "Hover over the link and verify the destination URL matches the sender’s intent"
+            },
+            {
+                question: "What is “spear phishing”?",
+                options: [
+                    "A type of attack that sends fake invoices to hundreds of users",
+                    "A highly targeted email designed to trick a specific individual",
+                    "A prank email using fake names and emojis"
+                ],
+                correctAnswer: "A highly targeted email designed to trick a specific individual"
+            },
+            {
+                question: "An email comes from “MicrosoftSecurity@micros0ft-support.com” and says your password is expiring. What is the most suspicious element?",
+                options: [
+                    "It doesn’t include your full name",
+                    "The sender domain uses subtle character substitutions to imitate a real address",
+                    "The email has minor formatting issues"
+                ],
+                correctAnswer: "The sender domain uses subtle character substitutions to imitate a real address"
+            },
+            {
+                question: "What best defines a Business Email Compromise (BEC)?",
+                options: [
+                    "A brute-force attack on a business user’s mailbox",
+                    "A phishing attack that impersonates a trusted internal figure to extract sensitive data or payments",
+                    "An unauthorized email redirect rule inside the user's inbox"
+                ],
+                correctAnswer: "A phishing attack that impersonates a trusted internal figure to extract sensitive data or payments"
+            },
+            {
+                question: "What is “link obfuscation” in the context of phishing?",
+                options: [
+                    "Disguising a malicious URL to appear legitimate (e.g., via URL shorteners or HTML masking)",
+                    "Using encrypted attachments to bypass antivirus tools",
+                    "Including a link that leads to a consent-based OAuth application"
+                ],
+                correctAnswer: "Disguising a malicious URL to appear legitimate (e.g., via URL shorteners or HTML masking)"
+            },
+            {
+                question: "You receive an invoice from a vendor that looks legitimate, but the bank info has changed. What’s your next step?",
+                options: [
+                    "Independently verify the change by calling a known contact — not by replying to the email",
+                    "Forward it to finance and flag it “High Importance”",
+                    "Pay it immediately to avoid service interruptions"
+                ],
+                correctAnswer: "Independently verify the change by calling a known contact — not by replying to the email"
+            },
+            {
+                question: "You get a brief email from your CEO: “Need a quick favor. Are you around?” No links or attachments. What should you do?",
+                options: [
+                    "Verify by contacting them directly via another channel (Teams, text, or call)",
+                    "Reply quickly to offer help",
+                    "Forward the email to IT, but don’t mark it as suspicious since it has no links"
+                ],
+                correctAnswer: "Verify by contacting them directly via another channel (Teams, text, or call)"
+            },
+            {
+                question: "Which of the following best indicates a spoofed display name in a phishing email?",
+                options: [
+                    "The sender’s name is correct, but the email address underneath doesn’t match the real one",
+                    "The email was sent outside of business hours",
+                    "The message is unusually brief or casual"
+                ],
+                correctAnswer: "The sender’s name is correct, but the email address underneath doesn’t match the real one"
+            },
+            {
+                question: "You’ve reported a suspicious email to your security team. What should you do next?",
+                options: [
+                    "Delete it and avoid any further interaction with it",
+                    "Forward it to others to warn them",
+                    "Reply to ask the sender if it was legitimate"
+                ],
+                correctAnswer: "Delete it and avoid any further interaction with it"
+            },
+            {
+                question: "If an email says your account is about to be locked, what should you do first?",
+                options: [
+                    "Panic and reset your password.",
+                    "Click the link before it expires.",
+                    "Click the link and also send IT an email letting them know you changed your password.",
+                    "Pause and verify with IT or your security team."
+                ],
+                correctAnswer: "Pause and verify with IT or your security team."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(questions.length).fill(null); // Stores selected option index
+        let score = 0;
+        let userName = '';
+
+        // DOM Elements
+        const welcomeSection = document.getElementById('welcomeSection');
+        const startQuizButton = document.getElementById('startQuizButton');
+        const quizSection = document.getElementById('quizSection');
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+        const submitButton = document.getElementById('submitButton');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const currentScoreSpan = document.getElementById('currentScore');
+        const totalQuestionsSpan = document.getElementById('totalQuestions');
+        const certificateContainer = document.getElementById('certificateContainer');
+        const certificateName = document.getElementById('certificateName');
+        const certificateDate = document.getElementById('certificateDate');
+        const downloadPdfButton = document.getElementById('downloadPdfButton');
+        const nameModal = document.getElementById('nameModal');
+        const userNameModalInput = document.getElementById('userNameModalInput');
+        const submitNameButton = document.getElementById('submitNameButton');
+        const cheatButton = document.getElementById('cheatButton'); // Get the cheat button
+        const adminLogButton = document.getElementById('adminLogButton'); // New Admin Log button
+        const quizLogSection = document.getElementById('quizLogSection'); // Quiz Log section
+        const backToWelcomeButton = document.getElementById('backToWelcomeButton'); // Back button in log
+        const passwordModal = document.getElementById('passwordModal'); // Password modal
+        const passwordInput = document.getElementById('passwordInput'); // Password input field
+        const submitPasswordButton = document.getElementById('submitPasswordButton'); // Submit password button
+        const cancelPasswordButton = document.getElementById('cancelPasswordButton'); // Cancel password button
+        const fanfareSound = document.getElementById('fanfareSound'); // Audio element for fanfare
+        const starAnimationOverlay = document.getElementById('starAnimationOverlay'); // Star animation container
+
+
+        totalQuestionsSpan.textContent = questions.length; // Update total questions count
+
+        // Function to load a question
+        function loadQuestion() {
+            const question = questions[currentQuestionIndex];
+            questionText.textContent = `${currentQuestionIndex + 1}. ${question.question}`;
+            optionsContainer.innerHTML = ''; // Clear previous options
+
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('option-button');
+                if (userAnswers[currentQuestionIndex] === index) {
+                    button.classList.add('selected');
+                }
+                button.addEventListener('click', () => selectOption(index));
+                optionsContainer.appendChild(button);
+            });
+
+            updateNavigationButtons();
+        }
+
+        // Function to select an option
+        function selectOption(selectedIndex) {
+            userAnswers[currentQuestionIndex] = selectedIndex;
+            // Remove 'selected' from all buttons and add to the clicked one
+            Array.from(optionsContainer.children).forEach((button, index) => {
+                button.classList.remove('selected');
+                if (index === selectedIndex) {
+                    button.classList.add('selected');
+                }
+            });
+        }
+
+        // Function to update navigation button states
+        function updateNavigationButtons() {
+            prevButton.disabled = currentQuestionIndex === 0;
+            nextButton.classList.toggle('hidden', currentQuestionIndex === questions.length - 1);
+            submitButton.classList.toggle('hidden', currentQuestionIndex !== questions.length - 1);
+        }
+
+        // Event listener for Start Quiz button (from welcome screen)
+        startQuizButton.addEventListener('click', () => {
+            welcomeSection.style.display = 'none';
+            quizLogSection.style.display = 'none'; // Hide log if visible
+            quizSection.style.display = 'block';
+            loadQuestion();
+        });
+
+        // Event listener for Admin Log button (new)
+        adminLogButton.addEventListener('click', () => {
+            passwordModal.classList.remove('hidden'); // Show password modal
+            passwordInput.value = ''; // Clear previous input
+            passwordInput.focus(); // Focus on the input
+        });
+
+        // Event listener for Submit Password button
+        submitPasswordButton.addEventListener('click', () => {
+            const enteredPassword = passwordInput.value;
+            if (enteredPassword === "PAC365") { // Correct password
+                passwordModal.classList.add('hidden'); // Hide password modal
+                welcomeSection.style.display = 'none';
+                quizSection.style.display = 'none';
+                certificateContainer.style.display = 'none';
+                nameModal.classList.add('hidden');
+                quizLogSection.style.display = 'block'; // Show quiz log
+                // The listenToQuizResults function (from Firebase script) will handle displaying the log
+            } else {
+                showMessageBox('Incorrect password. Please try again.');
+                passwordInput.value = ''; // Clear input on incorrect password
+            }
+        });
+
+        // Event listener for Cancel Password button
+        cancelPasswordButton.addEventListener('click', () => {
+            passwordModal.classList.add('hidden'); // Hide password modal
+        });
+
+
+        // Event listener for Back to Welcome button in log section
+        backToWelcomeButton.addEventListener('click', () => {
+            quizLogSection.style.display = 'none';
+            welcomeSection.style.display = 'block';
+        });
+
+        // Event listener for Next button
+        nextButton.addEventListener('click', () => {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            }
+        });
+
+        // Event listener for Previous button
+        prevButton.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        });
+
+        // Event listener for Submit Quiz button
+        submitButton.addEventListener('click', () => {
+            calculateScore();
+            displayResults();
+        });
+
+        // Function to trigger star animation
+        function triggerStarAnimation() {
+            const numberOfStars = 30; // Number of stars to generate
+            const maxDuration = 3000; // Max animation duration in ms
+
+            for (let i = 0; i < numberOfStars; i++) {
+                const star = document.createElement('span');
+                star.classList.add('star');
+
+                const size = Math.random() * 10 + 5; // Star size between 5px and 15px
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+
+                // Random start position (top half of the screen)
+                const startX = Math.random() * window.innerWidth;
+                const startY = Math.random() * window.innerHeight * 0.5; // Top half
+                star.style.setProperty('--start-x', `${startX}px`);
+                star.style.setProperty('--start-y', `${startY}px`);
+
+                // Mid point for more dynamic movement
+                const midX = Math.random() * window.innerWidth;
+                const midY = Math.random() * window.innerHeight * 0.7;
+                star.style.setProperty('--mid-x', `${midX}px`);
+                star.style.setProperty('--mid-y', `${midY}px`);
+
+                // Random end position (bottom half of the screen, or off-screen)
+                const endX = Math.random() * window.innerWidth;
+                const endY = window.innerHeight + Math.random() * 100; // Off-screen bottom
+                star.style.setProperty('--end-x', `${endX}px`);
+                star.style.setProperty('--end-y', `${endY}px`);
+
+                const duration = Math.random() * 1500 + 2000; // Duration between 2s and 3.5s
+                const delay = Math.random() * 1000; // Delay up to 1s
+                star.style.setProperty('--duration', `${duration / 1000}s`);
+                star.style.animationDelay = `${delay / 1000}s`;
+
+                starAnimationOverlay.appendChild(star);
+
+                // Remove star after its animation completes
+                setTimeout(() => {
+                    star.remove();
+                }, duration + delay + 50); // A little buffer
+            }
+        }
+
+        // Function to calculate the score
+        function calculateScore() {
+            score = 0;
+            questions.forEach((question, index) => {
+                const userAnswerIndex = userAnswers[index];
+                if (userAnswerIndex !== null && question.options[userAnswerIndex] === question.correctAnswer) {
+                    score++;
+                }
+            });
+        }
+
+        // Function to display results and show certificate if 100%
+        function displayResults() {
+            quizSection.style.display = 'none';
+            scoreDisplay.classList.remove('hidden');
+            currentScoreSpan.textContent = score;
+
+            if (score === questions.length) {
+                // User scored 100%, show name input modal
+                nameModal.classList.remove('hidden');
+                // Play fanfare
+                if (fanfareSound) {
+                    fanfareSound.play().catch(e => console.error("Error playing fanfare:", e));
+                    // Stop fanfare after 7 seconds
+                    setTimeout(() => {
+                        fanfareSound.pause();
+                        fanfareSound.currentTime = 0; // Reset sound to beginning
+                    }, 7000); // 7 seconds
+                }
+                // Trigger stars
+                triggerStarAnimation();
+            } else {
+                // User did not score 100%, show a message
+                showMessageBox(`You scored ${score} out of ${questions.length}. You need 100% to get the certificate. Please try again!`);
+                // Save result even if not perfect
+                saveQuizResult('Anonymous', score, questions.length, false);
+                resetQuiz();
+            }
+        }
+
+        // Event listener for Submit Name button in modal
+        submitNameButton.addEventListener('click', () => {
+            userName = userNameModalInput.value.trim();
+            if (userName) {
+                nameModal.classList.add('hidden'); // Hide modal
+                welcomeSection.style.display = 'none'; // Ensure welcome is hidden
+                quizSection.style.display = 'none'; // Ensure quiz is hidden
+                scoreDisplay.classList.add('hidden'); // Hide score display
+                quizLogSection.style.display = 'none'; // Hide log if visible
+                passwordModal.classList.add('hidden'); // Hide password modal if it was open
+
+                certificateContainer.style.display = 'block'; // Show certificate container
+                
+                certificateName.textContent = userName;
+                certificateDate.textContent = new Date().toLocaleDateString(undefined, { // Corrected toLocaleDateString
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                console.log("Certificate container should now be visible. Display style:", window.getComputedStyle(certificateContainer).display);
+
+                // Save perfect score result
+                saveQuizResult(userName, score, questions.length, true);
+
+            } else {
+                showMessageBox('Please enter your name to generate the certificate.');
+            }
+        });
+
+
+        // Function to reset the quiz for retry
+        function resetQuiz() {
+            currentQuestionIndex = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            score = 0;
+            scoreDisplay.classList.add('hidden');
+            welcomeSection.style.display = 'block'; // Go back to welcome screen
+            quizSection.style.display = 'none'; // Ensure quiz section is hidden
+            certificateContainer.style.display = 'none'; // Explicitly hide certificate
+            nameModal.classList.add('hidden'); // Hide modal if it's open
+            userNameModalInput.value = ''; // Clear name input in modal
+            quizLogSection.style.display = 'none'; // Hide log if visible
+            passwordModal.classList.add('hidden'); // Hide password modal if it's open
+            // Stop fanfare and clear stars
+            if (fanfareSound) {
+                fanfareSound.pause();
+                fanfareSound.currentTime = 0;
+            }
+            starAnimationOverlay.innerHTML = ''; // Clear all stars
+            // Remove any debug canvas that might be present
+            const debugCanvas = document.querySelector('.debug-canvas');
+            if (debugCanvas && debugCanvas.parentNode) {
+                debugCanvas.parentNode.removeChild(debugCanvas);
+            }
+        }
+
+        // Function to show a custom message box (replaces alert())
+        function showMessageBox(message) {
+            const messageBox = document.createElement('div');
+            messageBox.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: #3a3a3a; /* Dark background for message box */
+                color: #e0e0e0; /* Light text */
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                z-index: 1000;
+                text-align: center;
+                font-family: 'Inter', sans-serif;
+                max-width: 80%;
+            `;
+            messageBox.innerHTML = `
+                <p class="text-lg mb-4">${message}</p>
+                <button class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors" onclick="this.parentNode.remove()">OK</button>
+            `;
+            document.body.appendChild(messageBox);
+        }
+
+        // Event listener for the Cheat Button
+        cheatButton.addEventListener('click', () => {
+            score = questions.length; // Set score to 100%
+            // Simulate submitting the quiz to trigger the results display
+            displayResults();
+            showMessageBox("Cheat activated! You scored 100%.");
+        });
+
+
+        // Event listener for Download PDF button
+        downloadPdfButton.addEventListener('click', async () => {
+            console.log("Download PDF button clicked.");
+            // Temporarily hide the download button itself before capturing
+            downloadPdfButton.style.display = 'none';
+
+            const element = document.getElementById('certificateContainer');
+            console.log("Certificate container element:", element);
+            console.log("Element display style (before html2canvas):", window.getComputedStyle(element).display);
+            console.log("Element dimensions (offsetWidth, offsetHeight):", element.offsetWidth, element.offsetHeight);
+
+            // Ensure html2canvas is loaded
+            if (typeof html2canvas === 'undefined') {
+                console.error("html2canvas library not loaded.");
+                showMessageBox("Error: PDF generation library (html2canvas) not found. Please ensure your internet connection is stable.");
+                downloadPdfButton.style.display = 'block';
+                return;
+            }
+
+            // Add a small delay to ensure rendering is complete
+            await new Promise(resolve => setTimeout(resolve, 250)); // Increased delay
+
+            try {
+                const canvas = await html2canvas(element, {
+                    scale: 2, // Increase scale for better quality
+                    useCORS: true, // Important if you have external images/fonts
+                    logging: true // Enable logging for debugging
+                });
+                console.log("html2canvas completed. Canvas object:", canvas);
+                console.log("Canvas dimensions (width, height):", canvas.width, canvas.height);
+
+                // --- DEBUGGING: Append the generated canvas to the body to see what html2canvas captured ---
+                // This will show if html2canvas is producing a blank or incorrect image
+                // canvas.classList.add('debug-canvas'); // Add a class for specific styling
+                // document.body.appendChild(canvas);
+                // console.log("Debugging: Canvas appended to body. Check browser for a red-bordered image.");
+                // -----------------------------------------------------------------------------------------
+
+
+                downloadPdfButton.style.display = 'block'; // Re-show the download button after capturing
+
+                const imgData = canvas.toDataURL('image/png');
+                console.log("Image data generated.");
+
+                // Ensure jsPDF is loaded
+                const { jsPDF } = window.jspdf;
+                if (!jsPDF) {
+                    console.error("jsPDF library not loaded.");
+                    showMessageBox("Error: PDF generation library (jsPDF) not found. Please ensure your internet connection is stable.");
+                    // Remove debugging canvas if it was added
+                    const debugCanvas = document.querySelector('.debug-canvas');
+                    if (debugCanvas && debugCanvas.parentNode) debugCanvas.parentNode.removeChild(debugCanvas);
+                    return;
+                }
+                console.log("jsPDF loaded.");
+
+                const pdf = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'px',
+                    format: [canvas.width, canvas.height]
+                });
+                console.log("jsPDF instance created.");
+
+                pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+                console.log("Image added to PDF.");
+
+                const filename = `${userName.replace(/\s+/g, '_')}_PAC_Certificate.pdf`;
+                pdf.save(filename);
+                console.log(`PDF saved as: ${filename}`);
+
+                // Remove debugging canvas after successful PDF generation
+                const debugCanvas = document.querySelector('.debug-canvas');
+                if (debugCanvas && debugCanvas.parentNode) debugCanvas.parentNode.removeChild(debugCanvas);
+
+            } catch (error) {
+                console.error("Error during PDF generation:", error);
+                showMessageBox("An error occurred while generating the certificate. Please check the console for details.");
+                downloadPdfButton.style.display = 'block'; // Ensure button is visible even on error
+                // Remove debugging canvas if an error occurred
+                const debugCanvas = document.querySelector('.debug-canvas');
+                if (debugCanvas && debugCanvas.parentNode) {
+                    debugCanvas.parentNode.removeChild(debugCanvas);
+                }
+            }
+        });
+
+        // Initial state: show welcome section, hide others
+        welcomeSection.style.display = 'block';
+        quizSection.style.display = 'none';
+        certificateContainer.style.display = 'none';
+        nameModal.classList.add('hidden');
+        quizLogSection.style.display = 'none'; // Ensure log is hidden initially
+        passwordModal.classList.add('hidden'); // Ensure password modal is hidden initially
+    </script>
+</body>
+</html>
