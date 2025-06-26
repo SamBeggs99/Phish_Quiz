@@ -368,6 +368,25 @@
             animation: star-fall var(--duration) ease-out forwards;
             box-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700; /* Glow effect */
         }
+
+        /* Progress Bar Styles */
+        .progress-bar-container {
+            width: 100%;
+            background-color: #4a4a4a; /* Dark grey background for the bar */
+            border-radius: 0.5rem;
+            height: 1rem; /* Height of the progress bar */
+            overflow: hidden; /* Ensures the filled part stays within bounds */
+            margin-top: 1rem;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2); /* Inner shadow for depth */
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%; /* Initial width */
+            background-color: #10b981; /* Green fill color */
+            border-radius: 0.5rem; /* Rounded corners for the fill */
+            transition: width 0.3s ease-in-out; /* Smooth transition for width changes */
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-5">
@@ -377,7 +396,7 @@
         <div id="welcomeSection">
             <h1 class="text-3xl font-bold text-white mb-6">Welcome to the PAC Phishing Quiz!</h1>
             <p class="text-lg text-center text-gray-300 mb-8">
-                Show us your phishing detection skillz! If you score 100%, you'll even get a certificate!
+                Show us your phishing detection skillz! Get 15 or more correct answers to earn a certificate!
             </p>
             <button id="startQuizButton" class="nav-button primary w-full mb-4">Start Quiz</button>
             <!-- Removed View Quiz Log button from here -->
@@ -385,6 +404,10 @@
 
         <!-- Quiz Questions Section (Initially Hidden) -->
         <div id="quizSection" style="display: none;">
+            <!-- Progress Bar -->
+            <div class="progress-bar-container">
+                <div id="progressBarFill" class="progress-bar-fill"></div>
+            </div>
             <div id="questionDisplay" class="question-card">
                 <p class="text-xl font-semibold text-gray-100 mb-4" id="questionText"></p>
                 <div id="optionsContainer" class="flex flex-col gap-3">
@@ -409,9 +432,9 @@
             <p class="awarded-text">This is proudly awarded to:</p>
             <h2 class="student-name text-blue-700 text-4xl font-bold my-4" id="certificateName"></h2>
             <p class="achievement-text">
-                🏆 For achieving a <strong>PERFECT SCORE</strong> on the<br>
+                🏆 For achieving <strong>15 or more correct answers</strong> on the<br>
                 <strong>PAC Phishing Awareness Quiz</strong><br>
-                You spotted every trap. You dodged every link.<br>
+                You spotted many traps. You dodged many links.<br>
                 You are officially a certified <span class="emoji">🛡️</span> <strong>PHISHING EXPERT!</strong>
             </p>
             <p class="date-awarded">🗓️ Date: <span id="certificateDate"></span></p>
@@ -438,7 +461,7 @@
     <div id="nameModal" class="modal-overlay hidden">
         <div class="modal-content">
             <h2 class="text-2xl font-bold text-white mb-4">Congratulations!</h2>
-            <p class="text-lg text-gray-300 mb-4">You scored 100%! Please enter your full name for your certificate:</p>
+            <p class="text-lg text-gray-300 mb-4">You've earned a certificate! Please enter your full name:</p>
             <input type="text" id="userNameModalInput" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4" placeholder="Your Full Name">
             <button id="submitNameButton" class="nav-button primary w-full">Get My Certificate</button>
         </div>
@@ -608,9 +631,10 @@
             results.forEach(result => {
                 const listItem = document.createElement('li');
                 let scoreText = `${result.score}/${result.totalQuestions}`;
-                if (result.perfectScore) {
+                // Check if perfect score or 15+ correct for certificate
+                if (result.perfectScore || (result.score >= 15 && result.totalQuestions === questions.length)) {
                     listItem.classList.add('perfect-score');
-                    scoreText += ' (Perfect!)';
+                    scoreText += ' (Certified!)';
                 }
                 const date = result.timestamp ? new Date(result.timestamp.toDate()).toLocaleDateString() : 'N/A';
                 listItem.innerHTML = `
@@ -651,6 +675,16 @@
                 correctAnswer: "The message urges immediate action and has unexpected links or attachments"
             },
             {
+                question: "🎨 If a phishing email offered you unlimited pizza for life, what would you do?",
+                options: [
+                    "Click it faster than lightning",
+                    "Hover over the link, but stay strong",
+                    "Report it — no pizza is worth malware",
+                    "Cry a little, then report it anyway"
+                ],
+                correctAnswer: "Report it — no pizza is worth malware" // The "best" answer from a security standpoint
+            },
+            {
                 question: "What is the safest first step if you’re unsure about the legitimacy of an email?",
                 options: [
                     "Use your organization's report button or alert IT/security",
@@ -667,6 +701,16 @@
                     "Confirm that the link is hosted on a well-known domain like “google.com”"
                 ],
                 correctAnswer: "Hover over the link and verify the destination URL matches the sender’s intent"
+            },
+            {
+                question: "🐟 What does “phishing” rhyme with?",
+                options: [
+                    "Wishing",
+                    "Dishing",
+                    "Bad clicking",
+                    "All of the above"
+                ],
+                correctAnswer: "All of the above"
             },
             {
                 question: "What is “spear phishing”?",
@@ -687,6 +731,16 @@
                 correctAnswer: "The sender domain uses subtle character substitutions to imitate a real address"
             },
             {
+                question: "🕶️ The best way to avoid phishing is to:",
+                options: [
+                    "Trust your instincts and verify everything",
+                    "Quit the internet forever",
+                    "Hire a cat to sniff out malicious emails",
+                    "Only read emails at midnight on a full moon"
+                ],
+                correctAnswer: "Trust your instincts and verify everything"
+            },
+            {
                 question: "What best defines a Business Email Compromise (BEC)?",
                 options: [
                     "A brute-force attack on a business user’s mailbox",
@@ -705,6 +759,16 @@
                 correctAnswer: "Disguising a malicious URL to appear legitimate (e.g., via URL shorteners or HTML masking)"
             },
             {
+                question: "💡 What’s your phishing defense spirit animal?",
+                options: [
+                    "Owl – wise and always watching",
+                    "Cat – suspicious of everything",
+                    "Dog – loyal but a little too trusting",
+                    "Shark – bites fake emails in half"
+                ],
+                correctAnswer: "Owl – wise and always watching" // Pick one as correct for scoring purposes
+            },
+            {
                 question: "You receive an invoice from a vendor that looks legitimate, but the bank info has changed. What’s your next step?",
                 options: [
                     "Independently verify the change by calling a known contact — not by replying to the email",
@@ -712,6 +776,16 @@
                     "Pay it immediately to avoid service interruptions"
                 ],
                 correctAnswer: "Independently verify the change by calling a known contact — not by replying to the email"
+            },
+            {
+                question: "🐡 What is the most dangerous kind of fish?",
+                options: [
+                    "Piranha",
+                    "Electric eel",
+                    "Phish with a “ph”",
+                    "Sushi left out for 12 hours"
+                ],
+                correctAnswer: "Phish with a “ph”"
             },
             {
                 question: "You get a brief email from your CEO: “Need a quick favor. Are you around?” No links or attachments. What should you do?",
@@ -723,6 +797,16 @@
                 correctAnswer: "Verify by contacting them directly via another channel (Teams, text, or call)"
             },
             {
+                question: "Q: You receive an email from “IT Support” asking for your password. What spell do you cast?",
+                options: [
+                    "Expelli-phish-us!",
+                    "Accio Antivirus!",
+                    "Obliviate (and delete)!",
+                    "I report it and keep my magic to myself"
+                ],
+                correctAnswer: "I report it and keep my magic to myself"
+            },
+            {
                 question: "Which of the following best indicates a spoofed display name in a phishing email?",
                 options: [
                     "The sender’s name is correct, but the email address underneath doesn’t match the real one",
@@ -730,6 +814,16 @@
                     "The message is unusually brief or casual"
                 ],
                 correctAnswer: "The sender’s name is correct, but the email address underneath doesn’t match the real one"
+            },
+            {
+                question: "🖱️ What should you do when you see a suspicious link?",
+                options: [
+                    "Click first, think later (YOLO)",
+                    "Hover like a hawk and double-check",
+                    "Forward it to your group chat for laughs",
+                    "Reply “Nice try, hacker.”"
+                ],
+                correctAnswer: "Hover like a hawk and double-check"
             },
             {
                 question: "You’ve reported a suspicious email to your security team. What should you do next?",
@@ -759,7 +853,7 @@
         let wasBackgroundMusicPlaying = false; // New variable to track background music state
         const initialBackgroundVolume = 0.5; // Set initial background music volume
         const fanfareDuration = 8000; // Total fanfare duration in milliseconds (increased)
-        // Removed fanfareFadeOutDuration as it's no longer needed for a hard cut
+        const MIN_SCORE_FOR_CERTIFICATE = 15; // New constant for minimum score
 
         // DOM Elements
         const welcomeSection = document.getElementById('welcomeSection');
@@ -793,6 +887,7 @@
         const backgroundMusic = document.getElementById('backgroundMusic'); // Audio element for background music
         const muteButton = document.getElementById('muteButton'); // Mute button
         const starAnimationOverlay = document.getElementById('starAnimationOverlay'); // Star animation container
+        const progressBarFill = document.getElementById('progressBarFill'); // Progress bar fill element
 
         // Set initial background music volume
         backgroundMusic.volume = initialBackgroundVolume;
@@ -800,33 +895,52 @@
 
         totalQuestionsSpan.textContent = questions.length; // Update total questions count
 
+        // Function to shuffle an array (Fisher-Yates algorithm)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            }
+            return array;
+        }
+
         // Function to load a question
         function loadQuestion() {
             const question = questions[currentQuestionIndex];
             questionText.textContent = `${currentQuestionIndex + 1}. ${question.question}`;
             optionsContainer.innerHTML = ''; // Clear previous options
 
-            question.options.forEach((option, index) => {
+            // Shuffle options for the current question
+            const shuffledOptions = shuffleArray([...question.options]); // Create a copy to shuffle
+
+            shuffledOptions.forEach((option, index) => {
                 const button = document.createElement('button');
                 button.textContent = option;
                 button.classList.add('option-button');
-                if (userAnswers[currentQuestionIndex] === index) {
+                
+                // Find the index of the selected option in the original (unshuffled) array
+                const originalOptionIndex = question.options.indexOf(option);
+                if (userAnswers[currentQuestionIndex] === originalOptionIndex) {
                     button.classList.add('selected');
                 }
-                button.addEventListener('click', () => selectOption(index));
+                
+                // Store the original index of the option when it's selected
+                button.addEventListener('click', () => selectOption(originalOptionIndex));
                 optionsContainer.appendChild(button);
             });
 
             updateNavigationButtons();
+            updateProgressBar(); // Update progress bar on question load
         }
 
         // Function to select an option
         function selectOption(selectedIndex) {
             userAnswers[currentQuestionIndex] = selectedIndex;
             // Remove 'selected' from all buttons and add to the clicked one
-            Array.from(optionsContainer.children).forEach((button, index) => {
+            Array.from(optionsContainer.children).forEach((button) => {
                 button.classList.remove('selected');
-                if (index === selectedIndex) {
+                // Check if the text content of the button matches the selected option's text
+                if (questions[currentQuestionIndex].options[selectedIndex] === button.textContent) {
                     button.classList.add('selected');
                 }
             });
@@ -837,6 +951,12 @@
             prevButton.disabled = currentQuestionIndex === 0;
             nextButton.classList.toggle('hidden', currentQuestionIndex === questions.length - 1);
             submitButton.classList.toggle('hidden', currentQuestionIndex !== questions.length - 1);
+        }
+
+        // Function to update the progress bar
+        function updateProgressBar() {
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            progressBarFill.style.width = `${progress}%`;
         }
 
         // Event listener for Start Quiz button (from welcome screen)
@@ -975,8 +1095,11 @@
             scoreDisplay.classList.remove('hidden');
             currentScoreSpan.textContent = score;
 
-            if (score === questions.length) {
-                // User scored 100%, show name input modal
+            // Check if score is 15 or more for certificate
+            const earnedCertificate = score >= MIN_SCORE_FOR_CERTIFICATE;
+
+            if (earnedCertificate) {
+                // User scored enough for certificate, show name input modal
                 nameModal.classList.remove('hidden');
                 
                 // Pause background music before playing fanfare
@@ -1012,8 +1135,8 @@
                 // Trigger stars
                 triggerStarAnimation();
             } else {
-                // User did not score 100%, show a message
-                showMessageBox(`You scored ${score} out of ${questions.length}. You need 100% to get the certificate. Please try again!`);
+                // User did not score enough for certificate, show a message
+                showMessageBox(`You scored ${score} out of ${questions.length}. You need ${MIN_SCORE_FOR_CERTIFICATE} correct answers to get the certificate. Please try again!`);
                 // Save result even if not perfect
                 window.saveQuizResult('Anonymous', score, questions.length, false); // Use window.saveQuizResult
                 resetQuiz();
@@ -1079,6 +1202,7 @@
             if (!backgroundMusic.muted) {
                 backgroundMusic.play().catch(e => console.log("Background music autoplay prevented on reset:", e));
             }
+            updateProgressBar(); // Reset progress bar
         }
 
         // Function to show a custom message box (replaces alert())
@@ -1136,7 +1260,8 @@
                 const userName = `"${(result.userName || 'Anonymous').replace(/"/g, '""')}"`; // Handle commas and quotes
                 const score = result.score;
                 const totalQuestions = result.totalQuestions;
-                const perfectScore = result.perfectScore ? "Yes" : "No";
+                // Adjust perfectScore logic for CSV export to reflect new certificate criteria
+                const perfectScore = (result.score >= MIN_SCORE_FOR_CERTIFICATE && result.totalQuestions === questions.length) ? "Yes" : "No";
                 const date = result.timestamp ? new Date(result.timestamp.toDate()).toLocaleDateString() : 'N/A';
                 const userId = result.userId;
                 return `${userName},${score},${totalQuestions},${perfectScore},"${date}","${userId}"`;
