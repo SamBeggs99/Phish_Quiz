@@ -380,7 +380,7 @@
                 Show us your phishing detection skillz! If you score 100%, you'll even get a certificate!
             </p>
             <button id="startQuizButton" class="nav-button primary w-full mb-4">Start Quiz</button>
-            <button id="skipQuizButton" class="nav-button secondary w-full">Skip Quiz (for testing)</button>
+            <!-- Removed Skip Quiz Button -->
         </div>
 
         <!-- Quiz Questions Section (Initially Hidden) -->
@@ -764,7 +764,7 @@
         // DOM Elements
         const welcomeSection = document.getElementById('welcomeSection');
         const startQuizButton = document.getElementById('startQuizButton');
-        const skipQuizButton = document.getElementById('skipQuizButton'); // New skip button
+        // Removed skipQuizButton as requested by the user.
         const quizSection = document.getElementById('quizSection');
         const questionText = document.getElementById('questionText');
         const optionsContainer = document.getElementById('optionsContainer');
@@ -852,12 +852,12 @@
             backgroundMusic.play().catch(e => console.log("Background music autoplay prevented (initial):", e));
         });
 
-        // Event listener for Skip Quiz button (new)
-        skipQuizButton.addEventListener('click', () => {
-            score = questions.length; // Set score to perfect
-            currentQuestionIndex = questions.length - 1; // Set index to last question to satisfy displayResults logic
-            displayResults(); // Trigger results display and certificate flow
-        });
+        // Event listener for Skip Quiz button (new) - REMOVED
+        // skipQuizButton.addEventListener('click', () => {
+        //     score = questions.length; // Set score to perfect
+        //     currentQuestionIndex = questions.length - 1; // Set index to last question to satisfy displayResults logic
+        //     displayResults(); // Trigger results display and certificate flow
+        // });
 
         // Event listener for Admin Log button (new)
         adminLogButton.addEventListener('click', () => {
