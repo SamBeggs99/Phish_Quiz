@@ -269,7 +269,7 @@
         /* Admin Log Button */
         #adminLogButton {
             position: absolute;
-            top: 10px;
+            bottom: 10px;
             left: 10px;
             background-color: #4a4a4a; /* Dark grey */
             color: #e0e0e0;
@@ -368,25 +368,6 @@
             animation: star-fall var(--duration) ease-out forwards;
             box-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700; /* Glow effect */
         }
-
-        /* Progress Bar Styles */
-        .progress-bar-container {
-            width: 100%;
-            background-color: #4a4a4a; /* Dark grey background for the bar */
-            border-radius: 0.5rem;
-            height: 1rem; /* Height of the progress bar */
-            overflow: hidden; /* Ensures the filled part stays within bounds */
-            margin-top: 1rem;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2); /* Inner shadow for depth */
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            width: 0%; /* Initial width */
-            background-color: #10b981; /* Green fill color */
-            border-radius: 0.5rem; /* Rounded corners for the fill */
-            transition: width 0.3s ease-in-out; /* Smooth transition for width changes */
-        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-5">
@@ -396,18 +377,14 @@
         <div id="welcomeSection">
             <h1 class="text-3xl font-bold text-white mb-6">Welcome to the PAC Phishing Quiz!</h1>
             <p class="text-lg text-center text-gray-300 mb-8">
-                Show us your phishing detection skillz! Get 15 or more correct answers to earn a certificate!
+                Show us your phishing detection skillz! If you score 100%, you'll even get a certificate!
             </p>
             <button id="startQuizButton" class="nav-button primary w-full mb-4">Start Quiz</button>
-            <!-- Removed View Quiz Log button from here -->
+            <button id="skipQuizButton" class="nav-button secondary w-full">Skip Quiz (for testing)</button>
         </div>
 
         <!-- Quiz Questions Section (Initially Hidden) -->
         <div id="quizSection" style="display: none;">
-            <!-- Progress Bar -->
-            <div class="progress-bar-container">
-                <div id="progressBarFill" class="progress-bar-fill"></div>
-            </div>
             <div id="questionDisplay" class="question-card">
                 <p class="text-xl font-semibold text-gray-100 mb-4" id="questionText"></p>
                 <div id="optionsContainer" class="flex flex-col gap-3">
@@ -432,9 +409,9 @@
             <p class="awarded-text">This is proudly awarded to:</p>
             <h2 class="student-name text-blue-700 text-4xl font-bold my-4" id="certificateName"></h2>
             <p class="achievement-text">
-                🏆 For achieving <strong>15 or more correct answers</strong> on the<br>
+                🏆 For achieving an <strong>AWESOME SCORE</strong> on the<br>
                 <strong>PAC Phishing Awareness Quiz</strong><br>
-                You spotted many traps. You dodged many links.<br>
+                You spotted every trap. You dodged every link.<br>
                 You are officially a certified <span class="emoji">🛡️</span> <strong>PHISHING EXPERT!</strong>
             </p>
             <p class="date-awarded">🗓️ Date: <span id="certificateDate"></span></p>
@@ -461,7 +438,7 @@
     <div id="nameModal" class="modal-overlay hidden">
         <div class="modal-content">
             <h2 class="text-2xl font-bold text-white mb-4">Congratulations!</h2>
-            <p class="text-lg text-gray-300 mb-4">You've earned a certificate! Please enter your full name:</p>
+            <p class="text-lg text-gray-300 mb-4">You scored 100%! Please enter your full name for your certificate:</p>
             <input type="text" id="userNameModalInput" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4" placeholder="Your Full Name">
             <button id="submitNameButton" class="nav-button primary w-full">Get My Certificate</button>
         </div>
@@ -631,10 +608,9 @@
             results.forEach(result => {
                 const listItem = document.createElement('li');
                 let scoreText = `${result.score}/${result.totalQuestions}`;
-                // Check if perfect score or 15+ correct for certificate
-                if (result.perfectScore || (result.score >= 15 && result.totalQuestions === questions.length)) {
+                if (result.perfectScore) {
                     listItem.classList.add('perfect-score');
-                    scoreText += ' (Certified!)';
+                    scoreText += ' (Perfect!)';
                 }
                 const date = result.timestamp ? new Date(result.timestamp.toDate()).toLocaleDateString() : 'N/A';
                 listItem.innerHTML = `
@@ -675,16 +651,6 @@
                 correctAnswer: "The message urges immediate action and has unexpected links or attachments"
             },
             {
-                question: "🎨 If a phishing email offered you unlimited pizza for life, what would you do?",
-                options: [
-                    "Click it faster than lightning",
-                    "Hover over the link, but stay strong",
-                    "Report it — no pizza is worth malware",
-                    "Cry a little, then report it anyway"
-                ],
-                correctAnswer: "Report it — no pizza is worth malware" // The "best" answer from a security standpoint
-            },
-            {
                 question: "What is the safest first step if you’re unsure about the legitimacy of an email?",
                 options: [
                     "Use your organization's report button or alert IT/security",
@@ -701,16 +667,6 @@
                     "Confirm that the link is hosted on a well-known domain like “google.com”"
                 ],
                 correctAnswer: "Hover over the link and verify the destination URL matches the sender’s intent"
-            },
-            {
-                question: "🐟 What does “phishing” rhyme with?",
-                options: [
-                    "Wishing",
-                    "Dishing",
-                    "Bad clicking",
-                    "All of the above"
-                ],
-                correctAnswer: "All of the above"
             },
             {
                 question: "What is “spear phishing”?",
@@ -731,16 +687,6 @@
                 correctAnswer: "The sender domain uses subtle character substitutions to imitate a real address"
             },
             {
-                question: "🕶️ The best way to avoid phishing is to:",
-                options: [
-                    "Trust your instincts and verify everything",
-                    "Quit the internet forever",
-                    "Hire a cat to sniff out malicious emails",
-                    "Only read emails at midnight on a full moon"
-                ],
-                correctAnswer: "Trust your instincts and verify everything"
-            },
-            {
                 question: "What best defines a Business Email Compromise (BEC)?",
                 options: [
                     "A brute-force attack on a business user’s mailbox",
@@ -759,16 +705,6 @@
                 correctAnswer: "Disguising a malicious URL to appear legitimate (e.g., via URL shorteners or HTML masking)"
             },
             {
-                question: "💡 What’s your phishing defense spirit animal?",
-                options: [
-                    "Owl – wise and always watching",
-                    "Cat – suspicious of everything",
-                    "Dog – loyal but a little too trusting",
-                    "Shark – bites fake emails in half"
-                ],
-                correctAnswer: "Owl – wise and always watching" // Pick one as correct for scoring purposes
-            },
-            {
                 question: "You receive an invoice from a vendor that looks legitimate, but the bank info has changed. What’s your next step?",
                 options: [
                     "Independently verify the change by calling a known contact — not by replying to the email",
@@ -776,16 +712,6 @@
                     "Pay it immediately to avoid service interruptions"
                 ],
                 correctAnswer: "Independently verify the change by calling a known contact — not by replying to the email"
-            },
-            {
-                question: "🐡 What is the most dangerous kind of fish?",
-                options: [
-                    "Piranha",
-                    "Electric eel",
-                    "Phish with a “ph”",
-                    "Sushi left out for 12 hours"
-                ],
-                correctAnswer: "Phish with a “ph”"
             },
             {
                 question: "You get a brief email from your CEO: “Need a quick favor. Are you around?” No links or attachments. What should you do?",
@@ -797,16 +723,6 @@
                 correctAnswer: "Verify by contacting them directly via another channel (Teams, text, or call)"
             },
             {
-                question: "Q: You receive an email from “IT Support” asking for your password. What spell do you cast?",
-                options: [
-                    "Expelli-phish-us!",
-                    "Accio Antivirus!",
-                    "Obliviate (and delete)!",
-                    "I report it and keep my magic to myself"
-                ],
-                correctAnswer: "I report it and keep my magic to myself"
-            },
-            {
                 question: "Which of the following best indicates a spoofed display name in a phishing email?",
                 options: [
                     "The sender’s name is correct, but the email address underneath doesn’t match the real one",
@@ -814,16 +730,6 @@
                     "The message is unusually brief or casual"
                 ],
                 correctAnswer: "The sender’s name is correct, but the email address underneath doesn’t match the real one"
-            },
-            {
-                question: "🖱️ What should you do when you see a suspicious link?",
-                options: [
-                    "Click first, think later (YOLO)",
-                    "Hover like a hawk and double-check",
-                    "Forward it to your group chat for laughs",
-                    "Reply “Nice try, hacker.”"
-                ],
-                correctAnswer: "Hover like a hawk and double-check"
             },
             {
                 question: "You’ve reported a suspicious email to your security team. What should you do next?",
@@ -853,11 +759,12 @@
         let wasBackgroundMusicPlaying = false; // New variable to track background music state
         const initialBackgroundVolume = 0.5; // Set initial background music volume
         const fanfareDuration = 8000; // Total fanfare duration in milliseconds (increased)
-        const MIN_SCORE_FOR_CERTIFICATE = 15; // New constant for minimum score
+        // Removed fanfareFadeOutDuration as it's no longer needed for a hard cut
 
         // DOM Elements
         const welcomeSection = document.getElementById('welcomeSection');
         const startQuizButton = document.getElementById('startQuizButton');
+        const skipQuizButton = document.getElementById('skipQuizButton'); // New skip button
         const quizSection = document.getElementById('quizSection');
         const questionText = document.getElementById('questionText');
         const optionsContainer = document.getElementById('optionsContainer');
@@ -887,7 +794,6 @@
         const backgroundMusic = document.getElementById('backgroundMusic'); // Audio element for background music
         const muteButton = document.getElementById('muteButton'); // Mute button
         const starAnimationOverlay = document.getElementById('starAnimationOverlay'); // Star animation container
-        const progressBarFill = document.getElementById('progressBarFill'); // Progress bar fill element
 
         // Set initial background music volume
         backgroundMusic.volume = initialBackgroundVolume;
@@ -895,52 +801,33 @@
 
         totalQuestionsSpan.textContent = questions.length; // Update total questions count
 
-        // Function to shuffle an array (Fisher-Yates algorithm)
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
-            }
-            return array;
-        }
-
         // Function to load a question
         function loadQuestion() {
             const question = questions[currentQuestionIndex];
             questionText.textContent = `${currentQuestionIndex + 1}. ${question.question}`;
             optionsContainer.innerHTML = ''; // Clear previous options
 
-            // Shuffle options for the current question
-            const shuffledOptions = shuffleArray([...question.options]); // Create a copy to shuffle
-
-            shuffledOptions.forEach((option, index) => {
+            question.options.forEach((option, index) => {
                 const button = document.createElement('button');
                 button.textContent = option;
                 button.classList.add('option-button');
-                
-                // Find the index of the selected option in the original (unshuffled) array
-                const originalOptionIndex = question.options.indexOf(option);
-                if (userAnswers[currentQuestionIndex] === originalOptionIndex) {
+                if (userAnswers[currentQuestionIndex] === index) {
                     button.classList.add('selected');
                 }
-                
-                // Store the original index of the option when it's selected
-                button.addEventListener('click', () => selectOption(originalOptionIndex));
+                button.addEventListener('click', () => selectOption(index));
                 optionsContainer.appendChild(button);
             });
 
             updateNavigationButtons();
-            updateProgressBar(); // Update progress bar on question load
         }
 
         // Function to select an option
         function selectOption(selectedIndex) {
             userAnswers[currentQuestionIndex] = selectedIndex;
             // Remove 'selected' from all buttons and add to the clicked one
-            Array.from(optionsContainer.children).forEach((button) => {
+            Array.from(optionsContainer.children).forEach((button, index) => {
                 button.classList.remove('selected');
-                // Check if the text content of the button matches the selected option's text
-                if (questions[currentQuestionIndex].options[selectedIndex] === button.textContent) {
+                if (index === selectedIndex) {
                     button.classList.add('selected');
                 }
             });
@@ -953,12 +840,6 @@
             submitButton.classList.toggle('hidden', currentQuestionIndex !== questions.length - 1);
         }
 
-        // Function to update the progress bar
-        function updateProgressBar() {
-            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
-            progressBarFill.style.width = `${progress}%`;
-        }
-
         // Event listener for Start Quiz button (from welcome screen)
         startQuizButton.addEventListener('click', () => {
             welcomeSection.style.display = 'none';
@@ -969,6 +850,13 @@
             // This might still be prevented by browser autoplay policies on first user interaction,
             // but subsequent plays (e.g., after muting/unmuting) should work.
             backgroundMusic.play().catch(e => console.log("Background music autoplay prevented (initial):", e));
+        });
+
+        // Event listener for Skip Quiz button (new)
+        skipQuizButton.addEventListener('click', () => {
+            score = questions.length; // Set score to perfect
+            currentQuestionIndex = questions.length - 1; // Set index to last question to satisfy displayResults logic
+            displayResults(); // Trigger results display and certificate flow
         });
 
         // Event listener for Admin Log button (new)
@@ -1095,11 +983,8 @@
             scoreDisplay.classList.remove('hidden');
             currentScoreSpan.textContent = score;
 
-            // Check if score is 15 or more for certificate
-            const earnedCertificate = score >= MIN_SCORE_FOR_CERTIFICATE;
-
-            if (earnedCertificate) {
-                // User scored enough for certificate, show name input modal
+            if (score === questions.length) {
+                // User scored 100%, show name input modal
                 nameModal.classList.remove('hidden');
                 
                 // Pause background music before playing fanfare
@@ -1135,8 +1020,8 @@
                 // Trigger stars
                 triggerStarAnimation();
             } else {
-                // User did not score enough for certificate, show a message
-                showMessageBox(`You scored ${score} out of ${questions.length}. You need ${MIN_SCORE_FOR_CERTIFICATE} correct answers to get the certificate. Please try again!`);
+                // User did not score 100%, show a message
+                showMessageBox(`You scored ${score} out of ${questions.length}. You need 100% to get the certificate. Please try again!`);
                 // Save result even if not perfect
                 window.saveQuizResult('Anonymous', score, questions.length, false); // Use window.saveQuizResult
                 resetQuiz();
@@ -1175,17 +1060,22 @@
 
         // Function to reset the quiz for retry
         function resetQuiz() {
+            console.log("resetQuiz function called. Attempting to return to welcome screen.");
             currentQuestionIndex = 0;
             userAnswers = new Array(questions.length).fill(null);
             score = 0;
             scoreDisplay.classList.add('hidden');
+
+            // Explicitly hide all sections first, then show welcome
+            quizSection.style.display = 'none';
+            certificateContainer.style.display = 'none';
+            nameModal.classList.add('hidden');
+            quizLogSection.style.display = 'none';
+            passwordModal.classList.add('hidden');
             welcomeSection.style.display = 'block'; // Go back to welcome screen
-            quizSection.style.display = 'none'; // Ensure quiz section is hidden
-            certificateContainer.style.display = 'none'; // Explicitly hide certificate
-            nameModal.classList.add('hidden'); // Hide modal if it's open
-            userNameModalInput.value = ''; // Clear name input in modal
-            quizLogSection.style.display = 'none'; // Hide log if visible
-            passwordModal.classList.add('hidden'); // Hide password modal if it's open
+            console.log("Welcome section display style after reset:", welcomeSection.style.display);
+
+
             // Stop fanfare and clear stars
             if (fanfareSound) {
                 fanfareSound.pause();
@@ -1198,178 +1088,157 @@
             if (debugCanvas && debugCanvas.parentNode) {
                 debugCanvas.parentNode.removeChild(debugCanvas);
             }
-            // Ensure background music is playing if not muted
-            if (!backgroundMusic.muted) {
-                backgroundMusic.play().catch(e => console.log("Background music autoplay prevented on reset:", e));
-            }
-            updateProgressBar(); // Reset progress bar
         }
 
-        // Function to show a custom message box (replaces alert())
+        // Function to display a custom message box
+        // Now returns the messageBox element for external event listener attachment
         function showMessageBox(message) {
             const messageBox = document.createElement('div');
-            messageBox.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background-color: #3a3a3a; /* Dark background for message box */
-                color: #e0e0e0; /* Light text */
-                padding: 20px;
-                border-radius: 10px;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-                z-index: 1000;
-                text-align: center;
-                font-family: 'Inter', sans-serif;
-                max-width: 80%;
-            `;
+            messageBox.classList.add('modal-overlay');
             messageBox.innerHTML = `
-                <p class="text-lg mb-4">${message}</p>
-                <button class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors" onclick="this.parentNode.remove()">OK</button>
+                <div class="modal-content">
+                    <p class="text-lg text-gray-300 mb-4">${message}</p>
+                    <button id="messageBoxOkButton" class="nav-button primary w-full">OK</button>
+                </div>
             `;
             document.body.appendChild(messageBox);
+            console.log("MessageBox created and appended.");
+            return messageBox; // Return the created element
         }
-
-        // Removed Event listener for the Cheat Button
-
-        // Event listener for Mute Button
-        muteButton.addEventListener('click', () => {
-            if (backgroundMusic.muted) {
-                backgroundMusic.muted = false;
-                muteButton.textContent = "Mute Music";
-                backgroundMusic.play().catch(e => console.log("Background music autoplay prevented on unmute:", e));
-            } else {
-                backgroundMusic.muted = true;
-                muteButton.textContent = "Unmute Music";
-            }
-        });
-
-        // Function to export quiz log data to CSV
-        function exportQuizLogToCSV() {
-            // Access the global quizResultsData
-            if (window.quizResultsData.length === 0) {
-                showMessageBox("No quiz data to export yet!");
-                return;
-            }
-
-            // Define CSV headers
-            const headers = ["User Name", "Score", "Total Questions", "Perfect Score", "Date", "User ID"];
-            
-            // Map data to CSV rows
-            const rows = window.quizResultsData.map(result => {
-                const userName = `"${(result.userName || 'Anonymous').replace(/"/g, '""')}"`; // Handle commas and quotes
-                const score = result.score;
-                const totalQuestions = result.totalQuestions;
-                // Adjust perfectScore logic for CSV export to reflect new certificate criteria
-                const perfectScore = (result.score >= MIN_SCORE_FOR_CERTIFICATE && result.totalQuestions === questions.length) ? "Yes" : "No";
-                const date = result.timestamp ? new Date(result.timestamp.toDate()).toLocaleDateString() : 'N/A';
-                const userId = result.userId;
-                return `${userName},${score},${totalQuestions},${perfectScore},"${date}","${userId}"`;
-            });
-
-            // Combine headers and rows
-            const csvContent = [headers.join(","), ...rows].join("\n");
-
-            // Create a Blob and download link
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.setAttribute('download', 'quiz_log.csv');
-            document.body.appendChild(link); // Append to body to make it clickable
-            link.click(); // Programmatically click the link to trigger download
-            document.body.removeChild(link); // Clean up the link
-            showMessageBox("Quiz log exported to CSV!");
-        }
-
-        // Event listener for Export CSV button
-        exportCsvButton.addEventListener('click', exportQuizLogToCSV);
-
 
         // Event listener for Download PDF button
         downloadPdfButton.addEventListener('click', async () => {
-            console.log("Download PDF button clicked.");
-            // Temporarily hide the download button itself before capturing
+            const certificateElement = document.getElementById('certificateContainer');
+            const downloadPdfButton = document.getElementById('downloadPdfButton'); // Re-get button for state management
+
+            // Hide the download button to prevent it from appearing in the PDF
             downloadPdfButton.style.display = 'none';
 
-            const element = document.getElementById('certificateContainer');
-            console.log("Certificate container element:", element);
-            console.log("Element display style (before html2canvas):", window.getComputedStyle(element).display);
-            console.log("Element dimensions (offsetWidth, offsetHeight):", element.offsetWidth, element.offsetHeight);
+            // Show a loading message
+            const loadingMessageBox = showMessageBox("Generating your certificate... Please wait."); // Get reference to the loading message box
 
-            // Ensure html2canvas is loaded
-            if (typeof html2canvas === 'undefined') {
-                console.error("html2canvas library not loaded.");
-                showMessageBox("Error: PDF generation library (html2canvas) not found. Please ensure your internet connection is stable.");
-                downloadPdfButton.style.display = 'block';
-                return;
-            }
-
-            // Add a small delay to ensure rendering is complete
-            await new Promise(resolve => setTimeout(resolve, 250)); // Increased delay
+            let pdfGeneratedSuccessfully = false; // Flag to track success
 
             try {
-                const canvas = await html2canvas(element, {
-                    scale: 2, // Increase scale for better quality
-                    useCORS: true, // Important if you have external images/fonts
-                    logging: true // Enable logging for debugging
+                // Add a small delay to ensure the button is hidden and any re-renders are complete
+                await new Promise(resolve => setTimeout(resolve, 500)); // Increased delay to 500ms
+
+                const canvas = await html2canvas(certificateElement, {
+                    scale: 2, // Increase scale for better resolution
+                    useCORS: true, // Important for handling external resources like Google Fonts
+                    logging: true // Enable logging for html2canvas to console
                 });
-                console.log("html2canvas completed. Canvas object:", canvas);
-                console.log("Canvas dimensions (width, height):", canvas.width, canvas.height);
 
                 // --- DEBUGGING: Append the generated canvas to the body to see what html2canvas captured ---
                 // This will show if html2canvas is producing a blank or incorrect image
-                // canvas.classList.add('debug-canvas'); // Add a class for specific styling
-                // document.body.appendChild(canvas);
-                // console.log("Debugging: Canvas appended to body. Check browser for a red-bordered image.");
+                const existingDebugCanvas = document.querySelector('.debug-canvas');
+                if (existingDebugCanvas) {
+                    existingDebugCanvas.parentNode.removeChild(existingDebugCanvas);
+                }
+                canvas.classList.add('debug-canvas'); // Add a class for specific styling
+                document.body.appendChild(canvas);
+                console.log("Debugging: Canvas appended to body. Check browser for a red-bordered image.");
                 // -----------------------------------------------------------------------------------------
 
-
-                downloadPdfButton.style.display = 'block'; // Re-show the download button after capturing
-
                 const imgData = canvas.toDataURL('image/png');
-                console.log("Image data generated.");
 
-                // Ensure jsPDF is loaded
+                // Initialize jsPDF
                 const { jsPDF } = window.jspdf;
-                if (!jsPDF) {
-                    console.error("jsPDF library not loaded.");
-                    showMessageBox("Error: PDF generation library (jsPDF) not found. Please ensure your internet connection is stable.");
-                    // Remove debugging canvas if it was added
-                    const debugCanvas = document.querySelector('.debug-canvas');
-                    if (debugCanvas && debugCanvas.parentNode) debugCanvas.parentNode.removeChild(debugCanvas);
-                    return;
-                }
-                console.log("jsPDF loaded.");
-
                 const pdf = new jsPDF({
-                    orientation: 'landscape',
+                    orientation: 'portrait',
                     unit: 'px',
-                    format: [canvas.width, canvas.height]
+                    format: [canvas.width, canvas.height] // Use canvas dimensions for PDF
                 });
-                console.log("jsPDF instance created.");
 
+                // Add the image to the PDF
                 pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-                console.log("Image added to PDF.");
 
-                const filename = `${userName.replace(/\s+/g, '_')}_PAC_Certificate.pdf`;
-                pdf.save(filename);
-                console.log(`PDF saved as: ${filename}`);
+                // Save the PDF
+                pdf.save(`${userName}_PAC_Cybersecurity_Certificate.pdf`);
+                pdfGeneratedSuccessfully = true; // Set flag to true on successful save
 
-                // Remove debugging canvas after successful PDF generation
-                const debugCanvas = document.querySelector('.debug-canvas');
-                if (debugCanvas && debugCanvas.parentNode) debugCanvas.parentNode.removeChild(debugCanvas);
+            } catch (err) { // Changed 'error' to 'err' to avoid conflict with outer scope
+                console.error("Error during PDF generation:", err);
+                // The error message box will be shown in the finally block if pdfGeneratedSuccessfully is false
+            } finally {
+                // Ensure the loading message box is removed before showing the final message
+                if (loadingMessageBox && loadingMessageBox.parentNode) {
+                    loadingMessageBox.parentNode.removeChild(loadingMessageBox);
+                }
 
-            } catch (error) {
-                console.error("Error during PDF generation:", error);
-                showMessageBox("An error occurred while generating the certificate. Please check the console for details.");
-                downloadPdfButton.style.display = 'block'; // Ensure button is visible even on error
-                // Remove debugging canvas if an error occurred
+                downloadPdfButton.style.display = 'block'; // Ensure button is visible again
+                // Remove debugging canvas if present
                 const debugCanvas = document.querySelector('.debug-canvas');
                 if (debugCanvas && debugCanvas.parentNode) {
                     debugCanvas.parentNode.removeChild(debugCanvas);
                 }
+
+                // Show success or failure message and attach OK button listener
+                let finalMessageBox;
+                if (pdfGeneratedSuccessfully) {
+                    finalMessageBox = showMessageBox("Certificate generated and downloaded successfully!");
+                } else {
+                    finalMessageBox = showMessageBox("An error occurred while generating the certificate. Please check the console for details.");
+                }
+
+                // Attach the OK button listener to the *newly created* final message box
+                const okButton = finalMessageBox.querySelector('#messageBoxOkButton');
+                if (okButton) {
+                    console.log("Attempting to attach OK button listener.");
+                    okButton.addEventListener('click', () => {
+                        console.log("MessageBox OK clicked, executing callback...");
+                        document.body.removeChild(finalMessageBox);
+                        // Only reset quiz if PDF was successfully generated
+                        if (pdfGeneratedSuccessfully) {
+                            setTimeout(resetQuiz, 0); 
+                        }
+                    });
+                    console.log("OK button listener attached successfully.");
+                } else {
+                    console.error("Error: messageBoxOkButton not found in finalMessageBox.");
+                }
             }
         });
+
+        // Event listener for mute button
+        muteButton.addEventListener('click', () => {
+            backgroundMusic.muted = !backgroundMusic.muted;
+            muteButton.textContent = backgroundMusic.muted ? 'Unmute Music' : 'Mute Music';
+            if (!backgroundMusic.muted) {
+                // Try to play if unmuted and not already playing (browser might prevent)
+                backgroundMusic.play().catch(e => console.log("Background music autoplay prevented on unmute:", e));
+            }
+        });
+
+        // Function to export quiz log to CSV
+        exportCsvButton.addEventListener('click', () => {
+            if (window.quizResultsData.length === 0) {
+                showMessageBox("No quiz results to export.");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Name,Score,Total Questions,Perfect Score,Date\n"; // CSV Header
+
+            window.quizResultsData.forEach(result => {
+                const name = result.userName || 'Anonymous';
+                const score = result.score;
+                const totalQuestions = result.totalQuestions;
+                const perfectScore = result.perfectScore ? 'Yes' : 'No';
+                const date = result.timestamp ? new Date(result.timestamp.toDate()).toLocaleDateString() : 'N/A';
+                csvContent += `${name},${score},${totalQuestions},${perfectScore},${date}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "quiz_log.csv");
+            document.body.appendChild(link); // Required for Firefox
+            link.click();
+            document.body.removeChild(link); // Clean up
+            showMessageBox("Quiz log exported to CSV!");
+        });
+
 
         // Initial state: show welcome section, hide others
         welcomeSection.style.display = 'block';
